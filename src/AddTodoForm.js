@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 
-const AddTodoForm = ({ onAddTodo }) => { // Accept onAddTodo as a prop
+const AddTodoForm = ({ onAddTodo }) => { // accept onAddTodo as a prop
   const [todoTitle, setTodoTitle] = useState("");
 
   const handleAddTodo = (event) => {
-    event.preventDefault();
-    onAddTodo(todoTitle); // Call onAddTodo and pass todoTitle
+    event.preventDefault(); // prevent the default behavior of the form submit
+    onAddTodo({
+      title: todoTitle,
+      id: Date.now() // This is a placeholder; (need better way to generate unique ID)
+    });
     setTodoTitle("");
-  };
-
-  const handleChange = (event) => {
-    setTodoTitle(event.target.value);
   };
 
   return (
@@ -24,7 +23,7 @@ const AddTodoForm = ({ onAddTodo }) => { // Accept onAddTodo as a prop
           name="title"
           required
           value={todoTitle}
-          onChange={handleChange}
+          onChange={(e) => setTodoTitle(e.target.value)}
         />
         <br />
         <button type="submit">Add</button>

@@ -23,7 +23,7 @@ const AddTodoForm = ({ onAddTodo }) => { // accept onAddTodo as a prop
           name="title"
           required
           value={todoTitle}
-          onChange={(event) => setTodoTitle(event.target.value)}
+          onChange={(e) => setTodoTitle(e.target.value)}
         />
         <br />
         <button type="submit">Add</button>

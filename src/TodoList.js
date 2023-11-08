@@ -5,9 +5,9 @@ function TodoList({ todoList }) {
   return (
     <>
       <ul>
-        {todoList.map(function (item) {
+        {todoList.map(function ({ id, title }) {
           return (
-            <TodoListItem key={item.id} todo={item} />
+            <TodoListItem key={id} todo={title} />
           );
         })}
       </ul>

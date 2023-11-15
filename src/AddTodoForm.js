@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const AddTodoForm = ({ onAddTodo }) => { // accept onAddTodo as a prop
   const [todoTitle, setTodoTitle] = useState("");
+  const inputRef = useRef(null);
+
+  useEffect (() => {
+    inputRef.current.focus();
+  }, []);
 
   const handleAddTodo = (event) => {
     event.preventDefault(); // prevent the default behavior of the form submit
@@ -10,6 +15,7 @@ const AddTodoForm = ({ onAddTodo }) => { // accept onAddTodo as a prop
       id: Date.now() // This is a placeholder; (need better way to generate unique ID)
     });
     setTodoTitle("");
+    inputRef.current.focus(); //set focus for new todo
   };
 
   return (
@@ -18,6 +24,7 @@ const AddTodoForm = ({ onAddTodo }) => { // accept onAddTodo as a prop
         <label htmlFor="todoTitle">Title:</label>
         <br />
         <input
+          ref={inputRef}
           type="text"
           id="todoTitle"
           name="title"

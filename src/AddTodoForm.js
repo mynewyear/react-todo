@@ -4,7 +4,7 @@ import InputWithLabel from "./InputWithLabel";
 export default function AddTodoForm({ onAddTodo }) {
   const [todoTitle, setTodoTitle] = useState("");
 
-  //originally you doing this directly in the input like this: 
+//originally you doing this directly in the input like this: 
 //onChange((e)=>setTodoTitle(e.target.value)) which is 
 //totally valid, but now that things are moving around it 
 //probably makes more sense to define and pass this 

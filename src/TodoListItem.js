@@ -5,12 +5,10 @@ const TodoListItem = ({ id, todo, onRemoveTodo }) => {
     return <li>Error: Todo item is missing or incomplete.</li>;
   } 
   return (
-    <>
       <li key={id}>
         {todo} 
         <button type="button" onClick={() => onRemoveTodo(id)}>Remove</button>
       </li>
-    </>
   );
 };
 

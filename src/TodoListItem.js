@@ -1,11 +1,14 @@
 import React from "react";
 
-const TodoListItem = ({ todo }) => { // Destructuring todo directly in the function parameters
-  if (!todo.title) {
+const TodoListItem = ({ id, todo, onRemoveTodo }) => {
+  if (!todo) { // Check if todo exist
     return <li>Error: Todo item is missing or incomplete.</li>;
-  }
+  } 
   return (
-    <li>{todo.title}</li>
+      <li key={id}>
+        {todo} 
+        <button type="button" onClick={() => onRemoveTodo(id)}>Remove</button>
+      </li>
   );
 };
 

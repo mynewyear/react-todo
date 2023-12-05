@@ -7,21 +7,21 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = new Promise ((resolve, reject) => {
-      setTimeout(() => {
+    new Promise ((resolve, reject) => 
+      setTimeout(() => 
         resolve({
           data: {
-            todoList: JSON.parse(localStorage.getItem("savedTodoList"))
-          }
-        })
-      }, reject, 2000);
-    });
-    loadData.then((result) => {
+            todoList: JSON.parse(localStorage.getItem("savedTodoList")) || [],
+          },
+        }),
+       2000
+       )
+    ).then((result) => {
       setTodoList(result.data.todoList);
       setIsLoading(false);
     });
+  }, []);
 
-  });
   useEffect(() => {
     if (!isLoading) {
       localStorage.setItem("savedTodoList", JSON.stringify(todoList));

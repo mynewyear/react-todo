@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, {useEffect, useRef} from "react";
 
-const InputWithLabel = ({ children, todoTitle, handleTitleChange }) => {
+const InputWithLabel = ({children, todoTitle, handleTitleChange}) => {
     const inputRef = useRef();
 
     useEffect(() => {
@@ -10,15 +10,15 @@ const InputWithLabel = ({ children, todoTitle, handleTitleChange }) => {
     return (
         <>
             <label htmlFor="inputField">{children}</label>
-                <br />
-                <input
+            <br/>
+            <input
                 type="text"
                 id="inputField"
                 name="title"
                 value={todoTitle}
                 onChange={handleTitleChange}
                 required
-                ref = {inputRef}
+                ref={inputRef}
             />
         </>
     );

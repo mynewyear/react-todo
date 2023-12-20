@@ -1,15 +1,20 @@
-import React from "react";
+const TodoListItem = ({ todo, onRemoveTodo, todoCompletion }) => {
+    if (!todo) {
+        return <li>Error: Todo item is missing or incomplete.</li>;
+    }
+    const {title, id, completed} = todo;
 
-const TodoListItem = ({ id, todo, onRemoveTodo }) => {
-  if (!todo) { // Check if todo exist
-    return <li>Error: Todo item is missing or incomplete.</li>;
-  } 
-  return (
-      <li key={id}>
-        {todo} 
-        <button type="button" onClick={() => onRemoveTodo(id)}>Remove</button>
-      </li>
-  );
+    return (
+        <li style={{textDecoration: completed ? "line-through" : "none"}}>
+            <input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => todoCompletion(todo.id)}
+            />
+            {title}
+            <button type="button" onClick={() => onRemoveTodo(id)}>Remove</button>
+        </li>
+    );
 };
 
 export default TodoListItem;

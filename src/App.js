@@ -43,7 +43,7 @@ function App() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [todoList]);
 
     const addTodo = async (title) => {
         const newTodo = {

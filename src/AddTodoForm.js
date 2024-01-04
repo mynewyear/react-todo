@@ -10,10 +10,13 @@ const AddTodoForm = ({onAddTodo}) => {
 
     function handleAddTodo(e) {
         e.preventDefault();
-        if (todoTitle.trim() !== '') {
-            onAddTodo(todoTitle);
-            setTodoTitle("");
-        }
+    if (todoTitle.trim().length) { //your check is fine, just showing you another way to checking the same thing here
+      onAddTodo(todoTitle);
+      setTodoTitle("");
+    } else {
+      alert("Title is required");
+    }
+
     }
 
     return (

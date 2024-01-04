@@ -33,7 +33,6 @@ function App() {
             }));
 
             setTodoList(todos); // Set todoList
-            setIsLoading(false); // indicate that the fetch is complete
 
         } catch (error) {
             console.error('Fetch error:', error.message);

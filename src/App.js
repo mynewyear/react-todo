@@ -5,8 +5,7 @@ import AddTodoForm from "./AddTodoForm";
 function App() {
     const [todoList, setTodoList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const url = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${process.env.REACT_APP_TABLE_NAME}`;
-    
+
     // Fetch data from Airtable API
     const fetchData = async () => {
         const options = {
@@ -16,6 +15,8 @@ function App() {
             },
         };
 
+        const url = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${process.env.REACT_APP_TABLE_NAME}`;
+
         try {
             const response = await fetch(url, options);
             if (!response.ok) {
@@ -23,7 +24,7 @@ function App() {
             }
 
             const data = await response.json();
-
+            
             // Mapping data
             const todos = data.records.map(record => ({
                 title: record.fields.title,
@@ -38,11 +39,11 @@ function App() {
         } finally {
             setIsLoading(false);
         }
-    }
+    };
 
-        useEffect(() => {
+    useEffect(() => {
         fetchData();
-    }, [todoList]);
+    }, []);
 
     const addTodo = async (title) => {
         const newTodo = {

@@ -5,7 +5,8 @@ import AddTodoForm from "./AddTodoForm";
 function App() {
     const [todoList, setTodoList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
+    const url = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${process.env.REACT_APP_TABLE_NAME}`;
+    
     // Fetch data from Airtable API
     const fetchData = async () => {
         const options = {
@@ -14,8 +15,6 @@ function App() {
                 'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`
             },
         };
-
-        const url = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${process.env.REACT_APP_TABLE_NAME}`;
 
         try {
             const response = await fetch(url, options);
@@ -33,18 +32,17 @@ function App() {
             }));
 
             setTodoList(todos); // Set todoList
-            setIsLoading(false); // indicate that the fetch is complete
 
         } catch (error) {
             console.error('Fetch error:', error.message);
         } finally {
             setIsLoading(false);
         }
-    };
+    }
 
-    useEffect(() => {
+        useEffect(() => {
         fetchData();
-    }, []);
+    }, [todoList]);
 
     const addTodo = async (title) => {
         const newTodo = {

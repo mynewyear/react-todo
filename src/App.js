@@ -2,7 +2,14 @@ import React, {useEffect, useState, useCallback} from "react";
 import TodoList from "./TodoList";
 import AddTodoForm from "./AddTodoForm";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import styles from "styled-components";
+import "./index.css";
 
+
+ <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap"
+      rel="stylesheet"
+    />
 
 function App() {
     const [todoList, setTodoList] = useState([]);
@@ -105,7 +112,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={
-              <>
+              <div className={styles.container}>
                 <h1>ToDo List</h1>
                 <AddTodoForm onAddTodo={addTodo}/>
                 {isLoading ? (
@@ -118,7 +125,7 @@ function App() {
                     onReorderTodo={reorderTodo}
                   />
                 )}
-              </>
+              </div>
             } />
             <Route path="/new" element={<h1>New Todo List</h1>} />
           </Routes>

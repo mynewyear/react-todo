@@ -8,7 +8,7 @@ const TodoListItem = ({ todo, onRemoveTodo, todoCompletion }) => {
     const {title, id, completed} = todo;
 
     return (
-        <li className={{textDecoration: completed ? style.ListItemCompleted : style.ListItemNotCompleted}}>
+        <li className={completed ? style.ListItemCompleted : style.ListItemNotCompleted}>
             <input
                 className={style.checkbox}
                 type="checkbox"

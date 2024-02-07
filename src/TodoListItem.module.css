@@ -3,12 +3,12 @@
   }
   
   .ListItemCompleted {
-    color: rgb(0, 87, 128);
+    color: rgb(0, 147, 130);
     text-decoration: line-through;
   }
   
   .ListItemNotCompleted {
-    color: rgb(101, 204, 245);
+    color: rgb(41, 54, 194); 
     text-decoration: none;
   }
   

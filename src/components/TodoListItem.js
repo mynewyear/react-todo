@@ -1,5 +1,6 @@
 import React from 'react';
 import style from "./TodoListItem.module.css";
+import PropTypes from "prop-types";
 
 const TodoListItem = ({ todo, onRemoveTodo, todoCompletion }) => {
     if (!todo) {
@@ -20,5 +21,15 @@ const TodoListItem = ({ todo, onRemoveTodo, todoCompletion }) => {
         </li>
     );
 };
+
+TodoListItem.propTypes = {
+    todo: PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      title: PropTypes.string.isRequired, 
+      completed: PropTypes.bool, 
+    }).isRequired, 
+    onRemoveTodo: PropTypes.func.isRequired, 
+    todoCompletion: PropTypes.func.isRequired 
+  };
 
 export default TodoListItem;

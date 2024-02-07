@@ -1,0 +1,61 @@
+.ListItem {
+    color: #00396a; 
+  }
+  
+  .ListItemCompleted {
+    color: rgb(0, 147, 130);
+    text-decoration: line-through;
+  }
+  
+  .ListItemNotCompleted {
+    color: rgb(41, 54, 194); 
+    text-decoration: none;
+  }
+  
+  .ListItemError {
+    color: red;
+    /* more styles for error message */
+  }
+  
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+  
+  li {
+    padding: 5px;
+    margin: 5px;
+    display: flex;
+    align-items: center; /* Align items vertically */
+    background-color: #a8bfff; 
+  }
+  
+  li:nth-child(even) {
+    background-color: rgb(179, 212, 254);
+  }
+  
+  .itemText {
+    flex-grow: 1; /* Allows the text to fill the space */
+    margin: 0 10px; /* Adds space around the text */
+  }
+  
+  .button {
+    padding: 10px 20px;
+    border: 1px solid rgb(125, 153, 209);
+    border-radius: 20px; /* Adjust as needed for roundness */
+    cursor: pointer;
+    min-width: 32px;
+    background: transparent;
+    transition: all 0.1s ease-in;
+  }
+  
+  .button:hover {
+    background: rgb(21, 88, 188);
+    color: #e2f1ff;
+  }
+  
+  .checkbox {
+    margin-right: 12px; /* Space after the checkbox */
+  }
+  

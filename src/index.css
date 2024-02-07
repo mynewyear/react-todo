@@ -1,0 +1,35 @@
+/* Base styles for ul and li - these apply unless overridden by more specific rules */
+ul {
+    margin-top: 10px; /* Adjust the margin as needed */
+  }
+  
+  li {
+    margin-bottom: 5px; /* Adjust the margin as needed */
+  }
+  
+  section {
+    min-width: 600px;
+    background-color: white;
+    text-align: center;
+    padding: 20px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    box-shadow: rgba(145, 160, 175, 0.2) 0px 8px 24px;
+  }
+  
+  /* Media Query for screens >= 768px */
+  @media (max-width: 768px) {
+    body {
+      background-color: white;
+    }
+  
+    ul  {
+        display: block; 
+        margin-bottom: 10px;
+      }
+    
+    li {
+      margin-bottom: 10px; /* Increased space between list items */
+    }
+  }
+  

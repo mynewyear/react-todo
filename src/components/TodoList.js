@@ -20,9 +20,9 @@ function TodoList({ todoList, onRemoveTodo, toggleTodoCompletion, onReorderTodo 
 
 TodoList.propTypes = {
     todoList: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+        id: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
-        completed: PropTypes.bool
+        completed: PropTypes.bool.isRequired
     })).isRequired,
     onRemoveTodo: PropTypes.func.isRequired,
     toggleTodoCompletion: PropTypes.func.isRequired,

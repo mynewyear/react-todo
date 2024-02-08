@@ -24,9 +24,9 @@ const TodoListItem = ({ todo, onRemoveTodo, todoCompletion }) => {
 
 TodoListItem.propTypes = {
     todo: PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired, 
-      completed: PropTypes.bool, 
+      completed: PropTypes.bool.isRequired,
     }).isRequired, 
     onRemoveTodo: PropTypes.func.isRequired, 
     todoCompletion: PropTypes.func.isRequired 

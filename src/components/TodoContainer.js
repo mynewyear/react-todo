@@ -8,6 +8,7 @@ const TodoContainer = ({tableName}) => {
     const [todoList, setTodoList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const {count, setCount} = useContext(TodoCounterContext);
+    const [currentSortField, setCurrentSortField] = useState("title");
 
     // Dynamic URL based on tableName
     const getDynamicUrl = useCallback(() => {
@@ -34,10 +35,13 @@ const TodoContainer = ({tableName}) => {
             const todos = data.records.map(record => ({
                 title: record.fields.title,
                 id: record.id,
+                completeDateTime: record.fields.completeDateTime,
+                createDateTime: record.fields.createDateTime,
                 completed: record.fields.completed || false,
             }));
 
             setTodoList(todos);
+            updateSorts(todos, currentSortField);
         } catch (error) {
             console.error('Fetch error:', error.message);
         } finally {
@@ -163,6 +167,30 @@ const TodoContainer = ({tableName}) => {
         setTodoList(newTodoList);
     };
 
+    const updateSorts = (todos, sortBy) => {
+        let sortedTodos = [];
+        if (sortBy === "title") {
+            sortedTodos = [...todos].sort((objectA, objectB) => {
+                const titleA = objectA.title.toUpperCase();
+                const titleB = objectB.title.toUpperCase();
+
+                return titleA < titleB ? -1 : titleA === titleB ? 0 : 1;
+            });
+        } else if (sortBy === "completeDateTime") {
+            sortedTodos = [...todoList].sort((objectA, objectB) => {
+                const dateA = new Date(objectA.completeDateTime);
+                const dateB = new Date(objectB.completeDateTime);
+
+                if (isNaN(dateA)) return -1;
+                if (isNaN(dateB)) return 1;
+
+                return dateA - dateB;
+            });
+        }
+        console.log(sortedTodos);
+        setTodoList(sortedTodos);
+    };
+
     return (
         <section style={{position: "relative"}}>
             <button>
@@ -170,6 +198,16 @@ const TodoContainer = ({tableName}) => {
                     Back
                 </Link>
             </button>
+            <select
+                className="right-select"
+                onChange={(e) => {
+                    setCurrentSortField(e.target.value);
+                    updateSorts(todoList, e.target.value);
+                }}
+            >
+                <option value="title">title</option>
+                <option value="completeDateTime">completeDateTime</option>
+            </select>
             <h1 style={{textAlign: "center"}}>Todo List</h1>
             <AddTodoForm onAddTodo={addTodo}/>
             {isLoading && <p>Loading...</p>}

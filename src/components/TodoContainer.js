@@ -162,6 +162,7 @@ const TodoContainer = ({tableName}) => {
                     onToggleCompletion={toggleTodoCompletion}
                     onReorderTodo={reorderTodo}
                     onUpdateNewTitle={updateNewTitle}
+
                 />
             </>
         </section>

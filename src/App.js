@@ -20,7 +20,7 @@ const TableChooser = () => {
                 onChange={(event) => setTableName(event.target.value)}
             >
                 <option value={process.env.REACT_APP_TABLE_NAME}>Todo List</option>
-                <option value="List2">List 2</option>
+                <option value="List2">Todo List 2</option>
             </select>
             <TodoContainer tableName={tableName}/>
         </div>

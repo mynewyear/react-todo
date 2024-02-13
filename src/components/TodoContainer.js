@@ -9,8 +9,11 @@ const TodoContainer = ({tableName}) => {
     const [isLoading, setIsLoading] = useState(true);
     const {count, setCount} = useContext(TodoCounterContext);
 
-    // Dynamic URL construction based on tableName
-    const getDynamicUrl = useCallback(() => `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${tableName}`, [tableName]);
+    // Dynamic URL based on tableName
+    const getDynamicUrl = useCallback(() => {
+        const viewName = encodeURIComponent("Grid view"); // Adjust the view name as needed
+        return `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${tableName}?view=${viewName}`;
+    }, [tableName]);
 
     const fetchData = useCallback(async () => {
         const dynamicUrl = getDynamicUrl();
@@ -108,9 +111,31 @@ const TodoContainer = ({tableName}) => {
         }
     };
 
+    const deleteTodo = async (id) => {
+        //  URL for deletion
+        const deleteUrl = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${tableName}/${id}`;
+        try {
+            const response = await fetch(deleteUrl, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            //console.log("Delete successful"); //check
+            fetchData(); // Refresh the todo list after deletion
+        } catch (error) {
+            console.error('Error deleting todo:', error);
+        }
+    };
+
     const removeTodo = (id) => {
-        const updatedList = todoList.filter(todo => todo.id !== id);
-        setTodoList(updatedList);
+        deleteTodo(id).then(() => {
+            const updatedList = todoList.filter(todo => todo.id !== id);
+            setTodoList(updatedList);
+        });
     };
 
     const toggleTodoCompletion = (id) => {

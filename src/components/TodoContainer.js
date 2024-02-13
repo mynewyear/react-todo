@@ -16,38 +16,65 @@ const TodoContainer = ({tableName}) => {
         return `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${tableName}?view=${viewName}`;
     }, [tableName]);
 
+    const updateSorts = useCallback((todos) => {
+        let sortedTodos = [];
+        if (currentSortField === "title") {
+            sortedTodos = [...todos].sort((a, b) => {
+                const titleA = a.title.toUpperCase(); // Ensure case-insensitive comparison
+                const titleB = b.title.toUpperCase();
+                return titleA < titleB ? -1 : titleA > titleB ? 1 : 0;
+            });
+        } else if (currentSortField === "old to new") {
+            // Assuming your todos already include a 'createdTime' field correctly populated
+            sortedTodos = [...todos].sort((objectA, objectB) => {
+                // Direct comparison (without converting to Date objects)
+                const timeA = objectA.createdTime || ""; // Fallback to empty string if undefined
+                const timeB = objectB.createdTime || "";
+                return timeA < timeB ? -1 : timeA > timeB ? 1 : 0;
+            });
+        }
+         else if (currentSortField === "new to old") {
+            sortedTodos = [...todos].sort((objectA, objectB) => {
+                const dateA = new Date(objectA.completeDateTime);
+                const dateB = new Date(objectB.completeDateTime);
+
+                if (isNaN(dateA)) return -1;
+                if (isNaN(dateB)) return 1;
+
+                return dateA - dateB;
+            });
+        }
+        return sortedTodos;
+    }, [currentSortField]);
+
+
     const fetchData = useCallback(async () => {
         const dynamicUrl = getDynamicUrl();
-        const options = {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
-            },
-        };
-
+        setIsLoading(true);
         try {
-            const response = await fetch(dynamicUrl, options);
+            const response = await fetch(dynamicUrl, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
+                },
+            });
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
             }
-
             const data = await response.json();
-            const todos = data.records.map(record => ({
+            const sortedTodos = updateSorts(data.records.map(record => ({
                 title: record.fields.title,
                 id: record.id,
                 completeDateTime: record.fields.completeDateTime,
                 createDateTime: record.fields.createDateTime,
                 completed: record.fields.completed || false,
-            }));
-
-            setTodoList(todos);
-            updateSorts(todos, currentSortField);
+            })));
+            setTodoList(sortedTodos);
         } catch (error) {
-            console.error('Fetch error:', error.message);
+            console.error('Fetch error:', error);
         } finally {
             setIsLoading(false);
         }
-    }, [getDynamicUrl]); // includes getDynamicUrl as a dependency
+    }, [getDynamicUrl, updateSorts]); // includes getDynamicUrl as a dependency
 
     useEffect(() => {
         fetchData();
@@ -167,30 +194,6 @@ const TodoContainer = ({tableName}) => {
         setTodoList(newTodoList);
     };
 
-    const updateSorts = (todos, sortBy) => {
-        let sortedTodos = [];
-        if (sortBy === "title") {
-            sortedTodos = [...todos].sort((objectA, objectB) => {
-                const titleA = objectA.title.toUpperCase();
-                const titleB = objectB.title.toUpperCase();
-
-                return titleA < titleB ? -1 : titleA === titleB ? 0 : 1;
-            });
-        } else if (sortBy === "completeDateTime") {
-            sortedTodos = [...todoList].sort((objectA, objectB) => {
-                const dateA = new Date(objectA.completeDateTime);
-                const dateB = new Date(objectB.completeDateTime);
-
-                if (isNaN(dateA)) return -1;
-                if (isNaN(dateB)) return 1;
-
-                return dateA - dateB;
-            });
-        }
-        console.log(sortedTodos);
-        setTodoList(sortedTodos);
-    };
-
     return (
         <section style={{position: "relative"}}>
             <button>
@@ -206,7 +209,8 @@ const TodoContainer = ({tableName}) => {
                 }}
             >
                 <option value="title">title</option>
-                <option value="completeDateTime">completeDateTime</option>
+                <option value="old to new">old to new</option>
+                <option value="new to old">new to old</option>
             </select>
             <h1 style={{textAlign: "center"}}>Todo List</h1>
             <AddTodoForm onAddTodo={addTodo}/>
@@ -225,7 +229,6 @@ const TodoContainer = ({tableName}) => {
                     onToggleCompletion={toggleTodoCompletion}
                     onReorderTodo={reorderTodo}
                     onUpdateNewTitle={updateNewTitle}
-
                 />
             </>
         </section>

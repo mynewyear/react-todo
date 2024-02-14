@@ -3,7 +3,7 @@ import TodoListItem from "./TodoListItem";
 import PropTypes from "prop-types";
 
 
-function TodoList({ todoList, onRemoveTodo, onToggleCompletion, onReorderTodo }) {
+function TodoList({ todoList, onRemoveTodo, onToggleCompletion, onUpdateNewTitle }) {
     return (
         <ul>
             {todoList.map((todo) => (
@@ -12,6 +12,7 @@ function TodoList({ todoList, onRemoveTodo, onToggleCompletion, onReorderTodo })
                     todo={todo}
                     onRemoveTodo={onRemoveTodo}
                     onToggleCompletion={onToggleCompletion} // Use this prop consistently
+                    onUpdateNewTitle={onUpdateNewTitle}
                 />
             ))}
         </ul>
@@ -30,4 +31,3 @@ TodoList.propTypes = {
 };
 
 export default TodoList;
-

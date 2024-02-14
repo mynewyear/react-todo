@@ -1,23 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import style from "./TodoListItem.module.css";
 import PropTypes from "prop-types";
 
-const TodoListItem = ({ todo, onRemoveTodo, onToggleCompletion }) => { // Use onToggleCompletion here
-    if (!todo) {
-        return <li className={style.ListItemError}>Error: Todo item is missing or incomplete.</li>;
-    }
-    const {title, id, completed} = todo;
+const TodoListItem = ({ todo, onRemoveTodo, onToggleCompletion, onUpdateNewTitle }) => { // Use onToggleCompletion here
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTitle, setEditTitle] = useState(todo.title);
+
+    const handleEdit = () => {
+        setIsEditing(true);
+    };
+
+    const handleSave = () => {
+        onUpdateNewTitle(todo.id, editTitle); // Call the function to update the title in the parent state
+        setIsEditing(false);
+    };
+
+    const handleChange = (e) => {
+        setEditTitle(e.target.value);
+    };
 
     return (
-        <li className={completed ? style.ListItemCompleted : style.ListItemNotCompleted}>
-            <input
-                className={style.checkbox}
-                type="checkbox"
-                checked={completed} // Directly use completed from destructuring
-                onChange={() => onToggleCompletion(id)} // Use onToggleCompletion here
-            />
-            <span className={style.itemText}>{title}</span>
-            <button className={style.button} type="button" onClick={() => onRemoveTodo(id)}>Remove</button>
+        <li className={todo.completed ? style.ListItemCompleted : style.ListItemNotCompleted}>
+            {isEditing ? (
+                <input
+                    type="text"
+                    value={editTitle}
+                    onChange={handleChange}
+                    className={style.editInput}
+                />
+            ) : (
+                <>
+                    <input
+                        className={style.checkbox}
+                        type="checkbox"
+                        checked={todo.completed}
+                        onChange={() => onToggleCompletion(todo.id)}
+                    />
+                    <span className={style.itemText}>{todo.title}</span>
+                </>
+            )}
+            {isEditing ? (
+                <button className={style.button} onClick={handleSave}>Save</button>
+            ) : (
+                <>
+                    <button className={style.button} onClick={handleEdit}>Edit</button>
+                    <button className={style.button} onClick={() => onRemoveTodo(todo.id)}>Remove</button>
+                </>
+            )}
         </li>
     );
 };
@@ -29,7 +58,8 @@ TodoListItem.propTypes = {
         completed: PropTypes.bool.isRequired,
     }).isRequired,
     onRemoveTodo: PropTypes.func.isRequired,
-    onToggleCompletion: PropTypes.func.isRequired, // Ensure this matches what's passed in
+    onToggleCompletion: PropTypes.func.isRequired,
+    onUpdateNewTitle: PropTypes.func.isRequired,
 };
 
 export default TodoListItem;

@@ -5,17 +5,19 @@ const LandingPage = () => {
     return (
         <>
             <main>
-                <div>
+                <section className={styles.container}>
+                <div className={styles.titleAndButtonsContainer} >
                     <h1>Todo App</h1>
                 </div>
-                <div>
-                    <Link to="/TodoList">
+                <div className={styles.buttonContainer}>
+                    <Link to="/TodoList" className={styles.button}>
                         View Todo List
                     </Link>
-                    <Link to="/NewTodoList">
+                    <Link to="/NewTodoList" className={styles.button}>
                         Create New Todo List
                     </Link>
                 </div>
+                </section>
             </main>
             <footer className={styles.footer}>
                 <p>© 2024 Your Todo App. All rights reserved.</p>

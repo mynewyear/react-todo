@@ -3,78 +3,54 @@ import TodoList from "./TodoList";
 import AddTodoForm from "./AddTodoForm";
 import {TodoCounterContext} from './TodoCounterContext';
 import {Link} from "react-router-dom";
+import PropTypes from "prop-types";
+
+
 
 const TodoContainer = ({tableName}) => {
     const [todoList, setTodoList] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false); // Default should be false
     const {count, setCount} = useContext(TodoCounterContext);
-    const [currentSortField, setCurrentSortField] = useState("title");
+    const [sortField, setSortField] = useState("title");
 
     // Dynamic URL based on tableName
-    const getDynamicUrl = useCallback(() => {
-        const viewName = encodeURIComponent("Grid view"); // Adjust the view name as needed
-        return `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${tableName}?view=${viewName}`;
-    }, [tableName]);
+    const getDynamicUrl = useCallback(() => `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${tableName}?view=${encodeURIComponent('Grid view')}`, [tableName]);
 
-    const updateSorts = useCallback((todos) => {
-        let sortedTodos = [];
-        if (currentSortField === "title") {
-            sortedTodos = [...todos].sort((a, b) => {
-                const titleA = a.title.toUpperCase(); // Ensure case-insensitive comparison
-                const titleB = b.title.toUpperCase();
-                return titleA < titleB ? -1 : titleA > titleB ? 1 : 0;
-            });
-        } else if (currentSortField === "old to new") {
-            // Assuming your todos already include a 'createdTime' field correctly populated
-            sortedTodos = [...todos].sort((objectA, objectB) => {
-                // Direct comparison (without converting to Date objects)
-                const timeA = objectA.createdTime || ""; // Fallback to empty string if undefined
-                const timeB = objectB.createdTime || "";
-                return timeA < timeB ? -1 : timeA > timeB ? 1 : 0;
-            });
-        }
-         else if (currentSortField === "new to old") {
-            sortedTodos = [...todos].sort((objectA, objectB) => {
-                const dateA = new Date(objectA.completeDateTime);
-                const dateB = new Date(objectB.completeDateTime);
-
-                if (isNaN(dateA)) return -1;
-                if (isNaN(dateB)) return 1;
-
-                return dateA - dateB;
-            });
-        }
-        return sortedTodos;
-    }, [currentSortField]);
-
+    // Optimize the sorting function to be a part of state updates rather than a separate call
+    const sortTodos = useCallback((todos) => {
+        return todos.sort((a, b) => {
+            switch (sortField) {
+                case "title":
+                    return a.title.localeCompare(b.title);
+                case "old to new":
+                    return new Date(a.createDateTime) - new Date(b.createDateTime);
+                case "new to old":
+                    return new Date(b.createDateTime) - new Date(a.createDateTime);
+                default:
+                    return 0;
+            }
+        });
+    }, [sortField]);
 
     const fetchData = useCallback(async () => {
-        const dynamicUrl = getDynamicUrl();
         setIsLoading(true);
+        const dynamicUrl = getDynamicUrl();
         try {
             const response = await fetch(dynamicUrl, {
-                headers: {
-                    'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
-                },
+                headers: { 'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}` },
             });
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
             const data = await response.json();
-            const sortedTodos = updateSorts(data.records.map(record => ({
-                title: record.fields.title,
+            setTodoList(sortTodos(data.records.map(record => ({
+                ...record.fields,
                 id: record.id,
-                completeDateTime: record.fields.completeDateTime,
-                createDateTime: record.fields.createDateTime,
-                completed: record.fields.completed || false,
-            })));
-            setTodoList(sortedTodos);
+            }))));
         } catch (error) {
             console.error('Fetch error:', error);
         } finally {
             setIsLoading(false);
         }
-    }, [getDynamicUrl, updateSorts]); // includes getDynamicUrl as a dependency
+    }, [getDynamicUrl, sortTodos]);
 
     useEffect(() => {
         fetchData();
@@ -169,29 +145,62 @@ const TodoContainer = ({tableName}) => {
         });
     };
 
-    const toggleTodoCompletion = (id) => {
-        const updatedTodoList = todoList.map((todo) =>
+    const toggleTodoCompletion = async (id) => {
+        // Optimistically update the UI
+        const updatedTodoList = todoList.map(todo =>
             todo.id === id ? {...todo, completed: !todo.completed} : todo
         );
-
         const sortedTodoList = updatedTodoList.sort((a, b) =>
             a.completed === b.completed ? 0 : a.completed ? 1 : -1
-        );
-
+        )
         setTodoList(sortedTodoList);
-    };
 
-    const updateNewTitle = (id, newTitle) => {
-        const updatedTodoList = todoList.map((todo) =>
-            todo.id === id ? {...todo, title: newTitle} : todo
-        );
+        // Find the item that was updated
+        const todoToUpdate = sortedTodoList.find(todo => todo.id === id);
 
-        setTodoList(updatedTodoList);
-        updateTodo(updatedTodoList.find((itemTodo) => itemTodo.id === id));
+        // try to update the backend
+        try {
+            await updateTodo(id, {completed: todoToUpdate.completed});
+        } catch (error) {
+            console.error('Failed to update todo completion status:', error);
+        }
     };
 
     const reorderTodo = (newTodoList) => {
         setTodoList(newTodoList);
+    };
+
+    const updateNewTitle = async (id, newTitle) => {
+        const updateUrl = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${tableName}/${id}`;
+
+        const options = {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                fields: {
+                    title: newTitle // Make sure "title" matches the field name in your Airtable base
+                }
+            })
+        };
+
+        try {
+            const response = await fetch(updateUrl, options);
+            if (!response.ok) {
+                // If the HTTP request returns a non-ok response, throw an error
+                throw new Error(`Error: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Update successful', data);
+
+            // Optional: Refresh the todo list from the API to reflect the update
+            fetchData();
+        } catch (error) {
+            console.error('Error updating todo title:', error);
+        }
     };
 
     return (
@@ -204,13 +213,13 @@ const TodoContainer = ({tableName}) => {
             <select
                 className="right-select"
                 onChange={(e) => {
-                    setCurrentSortField(e.target.value);
-                    updateSorts(todoList, e.target.value);
+                    setSortField(e.target.value);
+                    sortTodos(todoList, e.target.value);
                 }}
             >
-                <option value="title">title</option>
-                <option value="old to new">old to new</option>
                 <option value="new to old">new to old</option>
+                <option value="old to new">old to new</option>
+                <option value="title">title</option>
             </select>
             <h1 style={{textAlign: "center"}}>Todo List</h1>
             <AddTodoForm onAddTodo={addTodo}/>
@@ -235,5 +244,22 @@ const TodoContainer = ({tableName}) => {
     );
 };
 
+
+TodoList.propTypes = {
+    // Expecting todoList to be an array of objects
+    todoList: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            title: PropTypes.string.isRequired,
+            completed: PropTypes.bool.isRequired,
+            // Include other properties expected in a todo item here
+        })
+    ).isRequired,
+    // Functions
+    onRemoveTodo: PropTypes.func.isRequired,
+    onToggleCompletion: PropTypes.func.isRequired,
+    onReorderTodo: PropTypes.func,
+    onUpdateNewTitle: PropTypes.func.isRequired,
+};
 
 export default TodoContainer;

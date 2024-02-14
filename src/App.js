@@ -1,14 +1,10 @@
 import React, {useState} from "react";
-//import TodoList from "./components/TodoList";
-//import AddTodoForm from "./components/AddTodoForm";
 import {BrowserRouter, Link, Route, Routes} from 'react-router-dom';
-//import  styled from "./App.module.css";
 import TodoContainer from "./components/TodoContainer";
-import {TodoCounterProvider} from './components/TodoCounterContext'; // Adjust the import path as necessary
+import {TodoCounterProvider} from './components/TodoCounterContext';
 import LandingPage from "./LandingPage";
+import PropTypes from 'prop-types';
 
-
-//const url = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${process.env.REACT_APP_TABLE_NAME}`;
 
 const TableChooser = () => {
     const [tableName, setTableName] = useState(process.env.REACT_APP_TABLE_NAME);
@@ -51,4 +47,7 @@ function App() {
     );
 }
 
+TodoContainer.propTypes = {
+    tableName: PropTypes.string.isRequired,
+};
 export default App;

@@ -6,6 +6,7 @@ import {Link} from "react-router-dom";
 import PropTypes from "prop-types";
 
 
+const baseUrl = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/`;
 
 const TodoContainer = ({tableName}) => {
     const [todoList, setTodoList] = useState([]);
@@ -14,7 +15,7 @@ const TodoContainer = ({tableName}) => {
     const [sortField, setSortField] = useState("title");
 
     // Dynamic URL based on tableName
-    const getDynamicUrl = useCallback(() => `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${tableName}?view=${encodeURIComponent('Grid view')}`, [tableName]);
+    const getDynamicUrl = useCallback(() => `${baseUrl}${tableName}?view=${encodeURIComponent('Grid view')}`, [tableName]);
 
     // Optimize the sorting function to be a part of state updates rather than a separate call
     const sortTodos = useCallback((todos) => {
@@ -37,13 +38,15 @@ const TodoContainer = ({tableName}) => {
         const dynamicUrl = getDynamicUrl();
         try {
             const response = await fetch(dynamicUrl, {
-                headers: { 'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}` },
+                headers: {'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`},
             });
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             const data = await response.json();
             setTodoList(sortTodos(data.records.map(record => ({
                 ...record.fields,
                 id: record.id,
+                title: record.fields.title,
+                completed: record.fields.completed,
             }))));
         } catch (error) {
             console.error('Fetch error:', error);
@@ -61,7 +64,7 @@ const TodoContainer = ({tableName}) => {
     }, [todoList, setCount]);
 
     const addTodo = async (title) => {
-        const dynamicUrl = getDynamicUrl(); // Use dynamic URL for POST request
+        const dynamicUrl = getDynamicUrl();
         const newTodo = {
             fields: {
                 title: title,
@@ -85,7 +88,7 @@ const TodoContainer = ({tableName}) => {
 
             const data = await response.json();
             setTodoList([...todoList, {
-                title: data.fields.Title,
+                title: data.fields.title,
                 id: data.id,
                 completed: data.fields.completed || false,
             }]);
@@ -95,24 +98,29 @@ const TodoContainer = ({tableName}) => {
         }
     };
 
-    const updateTodo = async (id, newValues) => {
-        const updateUrl = `${getDynamicUrl()}/${id}`;
+    //TODO: finish developing todo completion flow
+    const updateTodo = async (id, completedStatus) => {
+        const fieldsToUpdate = {
+            "fields": {
+                "completed": completedStatus,
+                ...(completedStatus ? {"completed": new Date().toISOString()} : {})
+            }
+        };
+
+        const updateUrl = `${baseUrl}${tableName}/${id}`;
         const options = {
             method: "PATCH",
             headers: {
                 'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({fields: newValues}),
+            body: JSON.stringify(fieldsToUpdate),
         };
 
         try {
             const response = await fetch(updateUrl, options);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            fetchData(); // Refetch todos list to reflect changes
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            fetchData(); // re-fetch data
         } catch (error) {
             console.error('Error updating todo:', error);
         }
@@ -120,7 +128,7 @@ const TodoContainer = ({tableName}) => {
 
     const deleteTodo = async (id) => {
         //  URL for deletion
-        const deleteUrl = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${tableName}/${id}`;
+        const deleteUrl = `${baseUrl}/${tableName}/${id}`;
         try {
             const response = await fetch(deleteUrl, {
                 method: "DELETE",
@@ -132,7 +140,6 @@ const TodoContainer = ({tableName}) => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             //console.log("Delete successful"); //check
-            fetchData(); // Refresh the todo list after deletion
         } catch (error) {
             console.error('Error deleting todo:', error);
         }
@@ -146,21 +153,22 @@ const TodoContainer = ({tableName}) => {
     };
 
     const toggleTodoCompletion = async (id) => {
+        // Find the item to update
+        const todoIndex = todoList.findIndex(todo => todo.id === id);
+        if (todoIndex === -1) return;
+
         // Optimistically update the UI
-        const updatedTodoList = todoList.map(todo =>
-            todo.id === id ? {...todo, completed: !todo.completed} : todo
-        );
-        const sortedTodoList = updatedTodoList.sort((a, b) =>
-            a.completed === b.completed ? 0 : a.completed ? 1 : -1
-        )
-        setTodoList(sortedTodoList);
+        const newTodoList = [...todoList];
+        newTodoList[todoIndex] = {
+            ...newTodoList[todoIndex],
+            completed: !newTodoList[todoIndex].completed
+        };
+        setTodoList(newTodoList);
 
-        // Find the item that was updated
-        const todoToUpdate = sortedTodoList.find(todo => todo.id === id);
-
-        // try to update the backend
+        // Update the backend
         try {
-            await updateTodo(id, {completed: todoToUpdate.completed});
+            await updateTodo(id, newTodoList[todoIndex].completed);
+            fetchData();
         } catch (error) {
             console.error('Failed to update todo completion status:', error);
         }
@@ -171,7 +179,7 @@ const TodoContainer = ({tableName}) => {
     };
 
     const updateNewTitle = async (id, newTitle) => {
-        const updateUrl = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/${tableName}/${id}`;
+        const updateUrl = `${baseUrl}/${tableName}/${id}`;
 
         const options = {
             method: 'PATCH',
@@ -181,7 +189,7 @@ const TodoContainer = ({tableName}) => {
             },
             body: JSON.stringify({
                 fields: {
-                    title: newTitle // Make sure "title" matches the field name in your Airtable base
+                    title: newTitle
                 }
             })
         };
@@ -189,7 +197,6 @@ const TodoContainer = ({tableName}) => {
         try {
             const response = await fetch(updateUrl, options);
             if (!response.ok) {
-                // If the HTTP request returns a non-ok response, throw an error
                 throw new Error(`Error: ${response.statusText}`);
             }
 
@@ -251,7 +258,7 @@ TodoList.propTypes = {
         PropTypes.shape({
             id: PropTypes.string.isRequired,
             title: PropTypes.string.isRequired,
-            completed: PropTypes.bool.isRequired,
+            completed: PropTypes.bool,
             // Include other properties expected in a todo item here
         })
     ).isRequired,

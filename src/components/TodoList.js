@@ -11,7 +11,7 @@ function TodoList({ todoList, onRemoveTodo, onToggleCompletion, onUpdateNewTitle
                     key={todo.id}
                     todo={todo}
                     onRemoveTodo={onRemoveTodo}
-                    onToggleCompletion={onToggleCompletion} // Use this prop consistently
+                    onToggleCompletion={onToggleCompletion}
                     onUpdateNewTitle={onUpdateNewTitle}
                 />
             ))}
@@ -23,7 +23,7 @@ TodoList.propTypes = {
     todoList: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
-        completed: PropTypes.bool.isRequired,
+        completed: PropTypes.bool,
     })).isRequired,
     onRemoveTodo: PropTypes.func.isRequired,
     onToggleCompletion: PropTypes.func.isRequired, // Ensure this matches the prop passed to TodoListItem

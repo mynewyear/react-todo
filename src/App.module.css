@@ -11,8 +11,21 @@
     padding: 0 16px;
   }
   .container {
+    font-weight: 200;
+    font-family: "Yellowtail", sans-serif;
+    font-variant: small-caps;
+    text-align: center;
+    color: #333;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    color: #1c1f23;
+    justify-content: space-around; /* space around items */
+    width: 80%;
+    max-width: 800px;
+    min-height: 90vh; /* Adjusted for better visual on large screens */
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; /* Soft shadow */
+    padding: 2rem; /* padding inside the container */
+    margin: 5vh auto; /* vertical margin and centers the container horizontally */
+    background-color: white; /* Paper-like background */
+    border-radius: 8px; /* Slightly rounded corners for the paper effect */
+    border: 1px solid rgba(0, 0, 0, 0.1); /* Subtle border */
   }

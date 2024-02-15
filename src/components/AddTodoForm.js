@@ -13,7 +13,7 @@ const AddTodoForm = ({onAddTodo}) => {
 
     function handleAddTodo(e) {
         e.preventDefault();
-    if (todoTitle.trim().length) { //your check is fine, just showing you another way to checking the same thing here
+    if (todoTitle.trim().length) {
       onAddTodo(todoTitle);
       setTodoTitle("");
     } else {

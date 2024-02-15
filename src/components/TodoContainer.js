@@ -98,29 +98,26 @@ const TodoContainer = ({tableName}) => {
         }
     };
 
-    //TODO: finish developing todo completion flow
-    const updateTodo = async (id, completedStatus) => {
+    const updateTodo = async (id, completed) => {
+        const updateUrl = `${baseUrl}${tableName}/${id}`;
         const fieldsToUpdate = {
-            "fields": {
-                "completed": completedStatus,
-                ...(completedStatus ? {"completed": new Date().toISOString()} : {})
-            }
+            "completed": completed
         };
 
-        const updateUrl = `${baseUrl}${tableName}/${id}`;
         const options = {
             method: "PATCH",
             headers: {
                 'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(fieldsToUpdate),
+            body: JSON.stringify({ fields: fieldsToUpdate }),
         };
 
         try {
             const response = await fetch(updateUrl, options);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            fetchData(); // re-fetch data
+            console.log("Todo updated successfully", await response.json());
+            //fetchData(); // re-fetch data
         } catch (error) {
             console.error('Error updating todo:', error);
         }
@@ -179,34 +176,28 @@ const TodoContainer = ({tableName}) => {
     };
 
     const updateNewTitle = async (id, newTitle) => {
-        const updateUrl = `${baseUrl}/${tableName}/${id}`;
+        const updateUrl = `${baseUrl}${tableName}/${id}`;
+        const fieldsToUpdate = {
+            "title": newTitle
+        };
 
         const options = {
-            method: 'PATCH',
+            method: "PATCH",
             headers: {
                 'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                fields: {
-                    title: newTitle
-                }
-            })
+            body: JSON.stringify({ fields: fieldsToUpdate }),
         };
 
         try {
             const response = await fetch(updateUrl, options);
-            if (!response.ok) {
-                throw new Error(`Error: ${response.statusText}`);
-            }
-
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
             console.log('Update successful', data);
-
-            // Optional: Refresh the todo list from the API to reflect the update
-            fetchData();
+            fetchData(); // re-fetch data
         } catch (error) {
-            console.error('Error updating todo title:', error);
+            console.error('Error updating todo:', error);
         }
     };
 

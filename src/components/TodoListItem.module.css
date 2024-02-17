@@ -3,7 +3,7 @@
 }
 
 .ListItemCompleted {
-    color: rgb(0, 147, 130);
+    color: rgb(255, 255, 255);
     text-decoration: line-through;
 }
 
@@ -28,31 +28,50 @@ li {
     margin: 5px;
     display: flex;
     align-items: center; /* Align items vertically */
-    background-color: #a8bfff;
+    background-color: #4cb2be;
 }
 
 li:nth-child(even) {
-    background-color: rgb(179, 212, 254);
+    background-color: #4cb2be;
 }
 
 .itemText {
     flex-grow: 1; /* Allows the text to fill the space */
     margin: 0 10px; /* Adds space around the text */
 }
+.inputField, .button {
+    height: 40px;
+    padding: 0 15px;
+    border-radius: 5px;
+    border: 1px solid #1558bc;
+}
+
+.inputField {
+    width: calc(100% - 32px);
+    background-color: white;
+}
 
 .button {
     padding: 10px 20px;
-    border: 1px solid rgb(125, 153, 209);
-    border-radius: 20px; /* Adjust as needed for roundness */
+    border: 1px solid #1558bc;
+    border-radius: 5px;
+    background-color: #1558bc;
+    color: white;
+    text-decoration: none;
     cursor: pointer;
-    min-width: 32px;
-    background: transparent;
-    transition: all 0.1s ease-in;
+    transition: background-color 0.3s ease;
+    display: inline-block;
 }
 
 .button:hover {
-    background: rgb(21, 88, 188);
-    color: #e2f1ff;
+    background-color: #1576bc;
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 20px;
 }
 
 .checkbox {

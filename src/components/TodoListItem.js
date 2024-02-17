@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState} from "react";
 import style from "./TodoListItem.module.css";
 import PropTypes from "prop-types";
 

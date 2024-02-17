@@ -19,9 +19,6 @@ const LandingPage = () => {
                 </div>
                 </section>
             </main>
-            <footer className={styles.footer}>
-                <p>© 2024 Your Todo App. All rights reserved.</p>
-            </footer>
         </>
     );
 };

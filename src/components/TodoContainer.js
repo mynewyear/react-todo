@@ -1,10 +1,9 @@
-import {useState, useEffect, useContext, useCallback} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import TodoList from "./TodoList";
 import AddTodoForm from "./AddTodoForm";
 import {TodoCounterContext} from './TodoCounterContext';
 import {Link} from "react-router-dom";
 import PropTypes from "prop-types";
-
 
 const baseUrl = `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE_ID}/`;
 
@@ -17,20 +16,25 @@ const TodoContainer = ({tableName}) => {
     // Dynamic URL based on tableName
     const getDynamicUrl = useCallback(() => `${baseUrl}${tableName}?view=${encodeURIComponent('Grid view')}`, [tableName]);
 
-    // Optimize the sorting function to be a part of state updates rather than a separate call
+    // sorting function
     const sortTodos = useCallback((todos) => {
-        return todos.sort((a, b) => {
+        const sortedTodos = [...todos].sort((a, b) => {
             switch (sortField) {
-                case "title":
+                case "A to Z":
                     return a.title.localeCompare(b.title);
+                case "Z to A":
+                    return b.title.localeCompare(a.title);
+                //TODO: sorting by data in development
                 case "old to new":
+                    // Ensure dates are compared correctly
                     return new Date(a.createDateTime) - new Date(b.createDateTime);
                 case "new to old":
                     return new Date(b.createDateTime) - new Date(a.createDateTime);
                 default:
-                    return 0;
+                    return a.title.localeCompare(b.title);
             }
         });
+        return sortedTodos;
     }, [sortField]);
 
     const fetchData = useCallback(async () => {
@@ -42,12 +46,12 @@ const TodoContainer = ({tableName}) => {
             });
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             const data = await response.json();
-            setTodoList(sortTodos(data.records.map(record => ({
+            const todosWithDate = data.records.map(record => ({
                 ...record.fields,
                 id: record.id,
-                title: record.fields.title,
-                completed: record.fields.completed,
-            }))));
+                createDateTime: record.fields.createDateTime,
+            }));
+            setTodoList(sortTodos(todosWithDate));
         } catch (error) {
             console.error('Fetch error:', error);
         } finally {
@@ -110,7 +114,7 @@ const TodoContainer = ({tableName}) => {
                 'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ fields: fieldsToUpdate }),
+            body: JSON.stringify({fields: fieldsToUpdate}),
         };
 
         try {
@@ -125,7 +129,8 @@ const TodoContainer = ({tableName}) => {
 
     const deleteTodo = async (id) => {
         //  URL for deletion
-        const deleteUrl = `${baseUrl}/${tableName}/${id}`;
+        const deleteUrl = `${baseUrl}${tableName}/${id}`;
+
         try {
             const response = await fetch(deleteUrl, {
                 method: "DELETE",
@@ -133,19 +138,21 @@ const TodoContainer = ({tableName}) => {
                     'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
                 },
             });
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+            setTodoList((currentTodos) => currentTodos.filter(todo => todo.id !== id));
             //console.log("Delete successful"); //check
         } catch (error) {
             console.error('Error deleting todo:', error);
+            throw new Error('Deletion failed');
         }
     };
 
     const removeTodo = (id) => {
-        deleteTodo(id).then(() => {
-            const updatedList = todoList.filter(todo => todo.id !== id);
-            setTodoList(updatedList);
+        deleteTodo(id).catch((error) => {
+            console.error('Failed to delete todo:', error);
         });
     };
 
@@ -187,7 +194,7 @@ const TodoContainer = ({tableName}) => {
                 'Authorization': `Bearer ${process.env.REACT_APP_AIRTABLE_API_TOKEN}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ fields: fieldsToUpdate }),
+            body: JSON.stringify({fields: fieldsToUpdate}),
         };
 
         try {
@@ -215,16 +222,17 @@ const TodoContainer = ({tableName}) => {
                     sortTodos(todoList, e.target.value);
                 }}
             >
+                <option value="A to Z">A to Z</option>
+                <option value="Z to A">Z to A</option>
                 <option value="new to old">new to old</option>
                 <option value="old to new">old to new</option>
-                <option value="title">title</option>
             </select>
-            <h1 style={{textAlign: "center"}}>Todo List</h1>
+            <h1 style={{color: "white", textAlign: "center"}}>Todo List</h1>
             <AddTodoForm onAddTodo={addTodo}/>
             {isLoading && <p>Loading...</p>}
             <>
                 <span style={{
-                    fontFamily: "Poppins, sans-serif",
+                    fontFamily: "Yellow-tail",
                     fontWeight: 100,
                     fontVariant: "small-caps",
                 }}>
@@ -250,7 +258,6 @@ TodoList.propTypes = {
             id: PropTypes.string.isRequired,
             title: PropTypes.string.isRequired,
             completed: PropTypes.bool,
-            // Include other properties expected in a todo item here
         })
     ).isRequired,
     // Functions

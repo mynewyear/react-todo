@@ -1,31 +1,52 @@
-* {
-    padding: 0;
+body, html {
     margin: 0;
-    box-sizing: border-box;
-  }
-  html {
-    font-family: "Montserrat", sans-serif;
-  }
-  body {
-    background: #eeeeee;
-    padding: 0 16px;
-  }
-  .container {
-    font-weight: 200;
+    padding: 0;
+    background-color: #f0f0f0; /* Light background for the app */
     font-family: "Yellowtail", sans-serif;
-    font-variant: small-caps;
-    text-align: center;
-    color: #333;
+}
+
+.container {
     display: flex;
     flex-direction: column;
-    justify-content: space-around; /* space around items */
+    align-items: center;
+    justify-content: center;
     width: 80%;
     max-width: 800px;
-    min-height: 90vh; /* Adjusted for better visual on large screens */
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; /* Soft shadow */
-    padding: 2rem; /* padding inside the container */
-    margin: 5vh auto; /* vertical margin and centers the container horizontally */
-    background-color: white; /* Paper-like background */
-    border-radius: 8px; /* Slightly rounded corners for the paper effect */
-    border: 1px solid rgba(0, 0, 0, 0.1); /* Subtle border */
-  }
+    min-height: 90vh;
+    padding: 2rem;
+    margin: 5vh auto;
+    background-color: #4cb2be; /* Sky blue background */
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.button, .buttonContainer button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #1558bc; /* Dark blue buttons */
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #1576bc;
+}
+
+
+/* Responsive design adjustments */
+@media (max-width: 600px) {
+    .container {
+        width: 94%;
+        margin: 3vh auto;
+        padding: 1rem;
+        background-color: #4cb2be;
+    }
+
+    .buttonContainer {
+        flex-direction: column;
+        gap: 5px;
+    }
+}

@@ -1,80 +1,71 @@
-html, body {
-    height: 100%;
-    margin: 0; /* Remove default margin */
-    display: flex;
-    flex-direction: column; /* Ensures footer stays at the bottom */
+body, html {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    font-family: "Yellowtail", sans-serif;
 }
 
 body {
-    flex: 1; /* Allows body to expand and fill available space */
     display: flex;
-    justify-content: center; /* horizontally */
-    align-items: center; /* vertically */
-    background-color: #f0f0f0; /* Optional: any background color */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
 }
 
 .container {
-    font-weight: 200;
-    font-family: "Yellowtail", sans-serif;
-    font-variant: small-caps;
-    text-align: center;
-    color: #333;
     display: flex;
     flex-direction: column;
-    justify-content: space-around; /* space around items */
+    align-items: center;
     width: 80%;
     max-width: 800px;
-    min-height: 90vh; /* Adjusted for better visual on large screens */
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; /* Soft shadow */
-    padding: 2rem; /* padding inside the container */
-    margin: 5vh auto; /* vertical margin and centers the container horizontally */
-    background-color: white; /* Paper-like background */
-    border-radius: 8px; /* Slightly rounded corners for the paper effect */
-    border: 1px solid rgba(0, 0, 0, 0.1); /* Subtle border */
+    min-height: 90vh;
+    padding: 2rem;
+    margin-top: 5vh;
+    background-color: #4cb2be;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-
-.titleAndButtonsContainer, .buttonsContainer {
-    display: flex;
-    justify-content: center; /* Center the content horizontally */
-    gap: 1000px; /* Creates space between elements */
-    flex-wrap: wrap; /* Allow elements to wrap on smaller screens */
-}
-
 
 .button {
     padding: 10px 20px;
-    border: 1px solid #7d99d1;
-    margin: fill;
-    border-radius: 20px;
+    border: 1px solid #1558bc;
+    border-radius: 5px;
+    background-color: #1558bc;
+    color: white;
+    text-decoration: none;
     cursor: pointer;
-    background-color: transparent;
     transition: background-color 0.3s ease;
-    text-decoration: none; /* Remove underline from links */
-    color: inherit; /* Use parent's text color */
-    min-width: 120px;
+    display: inline-block;
 }
 
 .button:hover {
-    background-color: #1558bc;
+    background-color: #1576bc;
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.titleAndButtonsContainer {
+    font-family: "Yellowtail", sans-serif;
     color: white;
 }
-
-.footer {
-    font-family: "Yellowtail", sans-serif;
-    font-weight: 100;
-    font-variant: normal;
-    background-color: transparent;
-    color: #06177e;
-    text-align: center;
-    width: 100%;
-    padding: 1rem 0; /* Adds padding to the top and bottom */
-}
-
+/* Responsive */
 @media (max-width: 600px) {
     .container {
-        width: 94%; /* Use a percentage width for responsiveness */
-        margin: 3vh auto; /* Increased margin for smaller devices */
-        padding: 1rem; /* Standard padding */
-        min-height: auto; /* Allow the container's height to adjust based on its content */
+        width: 94%;
+        margin: 3vh auto;
+        padding: 1rem;
+        min-height: auto;
+    }
+
+    .buttonContainer {
+        flex-direction: column;
+        gap: 5px;
     }
 }
